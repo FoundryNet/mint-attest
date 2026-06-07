@@ -1,0 +1,13 @@
+# caches / build
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+# os / env
+.DS_Store
+.env
+*.key
