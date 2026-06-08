@@ -19,6 +19,9 @@ class Actor:
     operator: Optional[str] = None
     wallet_address: Optional[str] = None
     newly_registered: bool = False
+    # Set only on autonomous (keyless) registration: the freshly minted fnet_ key,
+    # scoped to this actor. Returned ONCE — persist it. None on a keyed register.
+    api_key: Optional[str] = None
     raw: dict = field(default_factory=dict)
 
     @classmethod
@@ -30,7 +33,8 @@ class Actor:
             capabilities=d.get("capabilities") or [],
             operator=d.get("operator"),
             wallet_address=d.get("wallet_address"),
-            newly_registered=bool(d.get("newly_registered")),
+            newly_registered=bool(d.get("newly_registered") or d.get("autonomous")),
+            api_key=d.get("api_key"),
             raw=d,
         )
 

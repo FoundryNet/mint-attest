@@ -68,17 +68,21 @@ class MintClient:
     def actor(self) -> Optional[Actor]:
         return self._actor
 
-    def _headers(self) -> dict:
-        if not self.api_key:
+    def _headers(self, require_key: bool = True) -> dict:
+        h = {"Content-Type": "application/json",
+             "User-Agent": f"mint-attest/{__version__}"}
+        if self.api_key:
+            h["Authorization"] = f"Bearer {self.api_key}"
+        elif require_key:
             raise MintAuthError(
                 "No API key. Pass MintClient(api_key='fnet_…') or set MINT_API_KEY.")
-        return {"Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json",
-                "User-Agent": f"mint-attest/{__version__}"}
+        # else: anonymous request (autonomous self-registration mints a key)
+        return h
 
-    def _post(self, path: str, body: dict) -> dict:
+    def _post(self, path: str, body: dict, *, require_key: bool = True) -> dict:
         try:
-            r = self._http.post(self.endpoint + path, json=body, headers=self._headers())
+            r = self._http.post(self.endpoint + path, json=body,
+                                headers=self._headers(require_key=require_key))
         except httpx.HTTPError as e:
             raise MintAPIError(f"network error calling {path}: {e}") from e
         try:
@@ -112,14 +116,27 @@ class MintClient:
             "operator": operator or self._operator,
             "metadata": metadata,
         })
-        actor = Actor.from_dict(self._post("/v1/register", body))
+        # Autonomous (keyless) register: with no api_key, the server provisions a
+        # fresh fnet_ key scoped to this actor and returns it. We capture it so
+        # later attest() calls on this client just work — no human, no signup.
+        keyless = self.api_key is None
+        actor = Actor.from_dict(self._post("/v1/register", body, require_key=not keyless))
         self._actor = actor
+        if keyless and actor.api_key:
+            self.api_key = actor.api_key
         # remember resolved defaults for any future auto-register
         self._name = self._name or resolved_name
         return actor
 
     def _ensure_actor(self) -> Actor:
         if self._actor is None:
+            # Implicit auto-register (from attest/@attest) requires a key — we do
+            # NOT silently mint an autonomous key + on-chain records behind the
+            # decorator's fail-open. Call register() explicitly to go keyless.
+            if self.api_key is None:
+                raise MintAuthError(
+                    "No API key. Set MINT_API_KEY, or call client.register() "
+                    "explicitly to auto-provision an autonomous key.")
             self.register()
         return self._actor  # type: ignore[return-value]
 
