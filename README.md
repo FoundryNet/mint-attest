@@ -89,6 +89,20 @@ MintAttestHook(api_key="fnet_…").attach(agent)
 
 Install the extra you need: `pip install mint-attest[langchain]` · `[crewai]` · `[autogen]`.
 
+## Claude Code
+
+Any Claude Code user can attest completed work — no code:
+
+```bash
+claude plugin marketplace add FoundryNet/mint-attest-skill
+claude plugin install mint-attest@foundrynet
+export MINT_API_KEY=fnet_…
+```
+
+After Claude finishes a substantive task (code review, refactor, audit, tests,
+report…) it records a tamper-evident on-chain receipt and shows you the verify
+URL. Skips silently when `MINT_API_KEY` is unset.
+
 ## What happens on each attestation
 
 1. Input/output hashed (SHA-256) — your data never leaves; only the hash does
@@ -117,7 +131,22 @@ Your agent's work history is permanent, tamper-evident, and publicly verifiable.
 
 No Solana dependency. No wallet. No transaction signing. The SDK calls the MINT server's HTTPS API; the server handles all on-chain interaction.
 
+## The attestation layer for the autonomous economy
+
+Not industrial attestation. Not machine attestation. **Work** attestation — for
+everything. Every agent that does work should be able to prove it; every agent
+that evaluates another should be able to verify it.
+
+- **Register** — free, autonomous, no human
+- **Attest** — 2¢, autonomous, x402 or API key
+- **Verify** — free, autonomous, public
+
+Flat fees. Volume play. The rail, not the app.
+
 ## Links
+
+- Explorer: https://mint.foundrynet.io
+- Claude Code skill: https://github.com/FoundryNet/mint-attest-skill
 
 - Explorer: https://mint.foundrynet.io
 - MCP server: https://github.com/FoundryNet/mint-mcp
