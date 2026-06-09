@@ -1,4 +1,5 @@
-"""Typed return values: Actor, Receipt, TrustScore.
+"""Typed return values: Actor, Receipt, TrustScore, Rating, Recommendation,
+Discovered.
 
 Each `.from_dict` is tolerant of extra/missing fields (the server may add fields
 over time) and keeps the full payload on `.raw` so nothing is ever lost.
@@ -74,8 +75,9 @@ class Receipt:
 
 @dataclass
 class TrustScore:
-    """An actor's reputation. `score`/`total_attestations` are None while the
-    on-chain trust-read endpoint is rolling out; `pending` is True in that case."""
+    """An actor's reputation. The trust layer is live: `score` is the 0–100 trust
+    score and the rating/recommendation fields are populated. `pending` is True
+    only on older servers where the on-chain trust-read endpoint hadn't shipped."""
     mint_id: Optional[str]
     score: Optional[float] = None
     total_attestations: Optional[int] = None
@@ -84,11 +86,18 @@ class TrustScore:
     name: Optional[str] = None
     actor_type: Optional[str] = None
     work_types: dict = field(default_factory=dict)
+    avg_rating: Optional[float] = None
+    total_ratings: int = 0
+    recommendations_received: int = 0
+    recommendations_given: int = 0
+    last_active: Optional[str] = None
+    recent_ratings: list = field(default_factory=list)
+    recent_recommendations: list = field(default_factory=list)
     raw: dict = field(default_factory=dict)
 
     @staticmethod
     def _num(v):
-        # the server uses the sentinel string "pending" until trust-read ships
+        # older servers used the sentinel string "pending" before trust-read shipped
         if isinstance(v, (int, float)):
             return v, False
         if v == "pending":
@@ -108,5 +117,87 @@ class TrustScore:
             name=d.get("name"),
             actor_type=d.get("actor_type"),
             work_types=d.get("work_types") or {},
+            avg_rating=d.get("avg_rating"),
+            total_ratings=int(d.get("total_ratings") or 0),
+            recommendations_received=int(d.get("recommendations_received") or 0),
+            recommendations_given=int(d.get("recommendations_given") or 0),
+            last_active=d.get("last_active"),
+            recent_ratings=d.get("recent_ratings") or [],
+            recent_recommendations=d.get("recent_recommendations") or [],
             raw=d,
         )
+
+
+@dataclass
+class Rating:
+    """The result of rating an attestation."""
+    rating_id: Optional[str]
+    attestation_id: Optional[str] = None
+    rated_mint_id: Optional[str] = None
+    rater_mint_id: Optional[str] = None
+    score: Optional[int] = None
+    data_hash: Optional[str] = None
+    trust_score_updated: Optional[float] = None
+    status: Optional[str] = None
+    raw: dict = field(default_factory=dict)
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "Rating":
+        return cls(
+            rating_id=d.get("rating_id"), attestation_id=d.get("attestation_id"),
+            rated_mint_id=d.get("rated_mint_id"), rater_mint_id=d.get("rater_mint_id"),
+            score=d.get("score"), data_hash=d.get("data_hash"),
+            trust_score_updated=d.get("trust_score_updated"), status=d.get("status"), raw=d)
+
+
+@dataclass
+class Recommendation:
+    """The result of recommending an actor."""
+    recommendation_id: Optional[str]
+    recommended_mint_id: Optional[str] = None
+    recommender_mint_id: Optional[str] = None
+    context: Optional[str] = None
+    score: Optional[int] = None
+    data_hash: Optional[str] = None
+    trust_score_updated: Optional[float] = None
+    status: Optional[str] = None
+    raw: dict = field(default_factory=dict)
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "Recommendation":
+        return cls(
+            recommendation_id=d.get("recommendation_id"),
+            recommended_mint_id=d.get("recommended_mint_id"),
+            recommender_mint_id=d.get("recommender_mint_id"),
+            context=d.get("context"), score=d.get("score"), data_hash=d.get("data_hash"),
+            trust_score_updated=d.get("trust_score_updated"), status=d.get("status"), raw=d)
+
+
+@dataclass
+class Discovered:
+    """One actor returned by discover()."""
+    mint_id: Optional[str]
+    name: Optional[str] = None
+    actor_type: Optional[str] = None
+    trust_score: Optional[float] = None
+    total_attestations: int = 0
+    avg_rating: Optional[float] = None
+    total_ratings: int = 0
+    recommendations: int = 0
+    capabilities: list = field(default_factory=list)
+    mcp_endpoint: Optional[str] = None
+    description: Optional[str] = None
+    last_active: Optional[str] = None
+    top_recommendations: list = field(default_factory=list)
+    raw: dict = field(default_factory=dict)
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "Discovered":
+        return cls(
+            mint_id=d.get("mint_id"), name=d.get("name"), actor_type=d.get("actor_type"),
+            trust_score=d.get("trust_score"), total_attestations=int(d.get("total_attestations") or 0),
+            avg_rating=d.get("avg_rating"), total_ratings=int(d.get("total_ratings") or 0),
+            recommendations=int(d.get("recommendations") or 0),
+            capabilities=d.get("capabilities") or [], mcp_endpoint=d.get("mcp_endpoint"),
+            description=d.get("description"), last_active=d.get("last_active"),
+            top_recommendations=d.get("top_recommendations") or [], raw=d)

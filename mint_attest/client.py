@@ -19,7 +19,7 @@ import httpx
 
 from . import __version__
 from .exceptions import MintAPIError, MintAuthError, MintConfigError
-from .models import Actor, Receipt, TrustScore
+from .models import Actor, Discovered, Rating, Receipt, Recommendation, TrustScore
 
 DEFAULT_ENDPOINT = "https://mint-mcp-production.up.railway.app"
 
@@ -178,6 +178,79 @@ class MintClient:
         if not body:
             raise MintConfigError("Provide mint_id or actor_name (or register first).")
         return TrustScore.from_dict(self._post("/v1/verify", body))
+
+    # ── rate ─────────────────────────────────────────────────────────────────────
+    def rate(self, attestation_id: str, rated_mint_id: str, score: int,
+             *, tags: Optional[list] = None, comment: Optional[str] = None,
+             accuracy: bool = True, would_use_again: bool = True,
+             rater_mint_id: Optional[str] = None) -> Rating:
+        """Rate a completed attestation 1–5; recomputes the rated actor's trust
+        score. FREE. Your fnet_ key identifies you as the rater (bound to an actor
+        your key owns). You can't rate yourself, and each attestation once.
+
+        Args:
+            attestation_id: the attestation being rated (Receipt.attestation_id).
+            rated_mint_id: the actor that did the work.
+            score: 1–5.
+            tags: optional descriptors, e.g. ["fast", "thorough"].
+            comment: optional free-text.
+            rater_mint_id: which of YOUR owned actors is rating (only needed if
+                your key owns more than one); defaults to this client's agent.
+        """
+        body = _strip_none({
+            "attestation_id": attestation_id, "rated_mint_id": rated_mint_id,
+            "score": score, "tags": tags, "comment": comment,
+            "accuracy": accuracy, "would_use_again": would_use_again,
+            "rater_mint_id": rater_mint_id or self.mint_id,
+        })
+        return Rating.from_dict(self._post("/v1/rate", body))
+
+    # ── recommend ────────────────────────────────────────────────────────────────
+    def recommend(self, recommended_mint_id: str, context: str, score: int,
+                  *, note: Optional[str] = None, attestation_id: Optional[str] = None,
+                  recommender_mint_id: Optional[str] = None) -> Recommendation:
+        """Endorse another actor in a named context 1–5; recomputes their trust.
+        FREE. You can't recommend yourself; each (you, them, context) is unique.
+
+        Args:
+            recommended_mint_id: the actor you're endorsing.
+            context: what you're endorsing them for, e.g. "cross-oem normalization".
+            score: 1–5.
+            note: optional free-text.
+            attestation_id: optional attestation backing this recommendation.
+            recommender_mint_id: which of YOUR owned actors is recommending
+                (only needed if your key owns more than one); defaults to this client.
+        """
+        body = _strip_none({
+            "recommended_mint_id": recommended_mint_id, "context": context,
+            "score": score, "note": note, "attestation_id": attestation_id,
+            "recommender_mint_id": recommender_mint_id or self.mint_id,
+        })
+        return Recommendation.from_dict(self._post("/v1/recommend", body))
+
+    # ── discover ─────────────────────────────────────────────────────────────────
+    def discover(self, capability: Optional[str] = None, *,
+                 actor_type: Optional[str] = None, min_trust: float = 0,
+                 min_recommendations: int = 0, sort_by: str = "trust_score",
+                 limit: int = 10) -> list:
+        """Trust-ranked search of the actor directory. FREE, no auth required.
+        Returns a list[Discovered], best first.
+
+        Args:
+            capability: capability or keyword, e.g. "telemetry normalization".
+            actor_type: optional filter — "ai_agent" | "machine" | "iot_device" | "service".
+            min_trust: only actors at/above this trust score (0–100).
+            min_recommendations: only actors with at least this many endorsements.
+            sort_by: "trust_score" (default) | "recommendations" | "recent".
+            limit: max results, 1–50.
+        """
+        body = _strip_none({
+            "capability": capability, "actor_type": actor_type,
+            "min_trust_score": min_trust, "min_recommendations": min_recommendations,
+            "sort_by": sort_by, "limit": limit,
+        })
+        data = self._post("/v1/discover", body, require_key=False)
+        return [Discovered.from_dict(r) for r in (data.get("results") or [])]
 
     # ── lifecycle ────────────────────────────────────────────────────────────────
     def close(self) -> None:

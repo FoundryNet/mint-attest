@@ -13,17 +13,17 @@ server-side. Framework integrations live in mint_attest.langchain / .crewai /
 """
 from __future__ import annotations
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 from .client import MintClient, hash_data
 from .decorator import attest, configure, get_default_client, set_default_client
 from .exceptions import MintAPIError, MintAuthError, MintConfigError, MintError
-from .models import Actor, Receipt, TrustScore
+from .models import Actor, Discovered, Rating, Receipt, Recommendation, TrustScore
 
 __all__ = [
     "__version__",
     "attest", "configure", "MintClient",
     "get_default_client", "set_default_client", "hash_data",
-    "Actor", "Receipt", "TrustScore",
+    "Actor", "Receipt", "TrustScore", "Rating", "Recommendation", "Discovered",
     "MintError", "MintAuthError", "MintAPIError", "MintConfigError",
 ]
