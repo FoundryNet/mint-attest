@@ -13,7 +13,9 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Optional
+from typing import Optional, Type
+
+from pydantic import BaseModel, Field
 
 from ..client import MintClient
 from ..exceptions import MintError
@@ -40,6 +42,21 @@ def _base_tool():
 _BaseTool = _base_tool()
 
 
+class MintAttestToolSchema(BaseModel):
+    """Arguments the agent passes when it attests a completed unit of work.
+
+    Declared explicitly so the tool works across CrewAI versions — CrewAI 1.x
+    otherwise tries to build this schema from `_run`'s annotations, which this module
+    defers via `from __future__ import annotations`, and can't resolve on its own.
+    """
+    summary: str = Field(
+        ..., description="What you did and the result (one or two sentences).")
+    work_type: Optional[str] = Field(
+        default=None,
+        description="Optional work category: research | analysis | generation | "
+                    "code_review | delivery | custom.")
+
+
 class MintAttestTool(_BaseTool):  # type: ignore[misc,valid-type]
     name: str = "mint_attest"
     description: str = (
@@ -47,6 +64,7 @@ class MintAttestTool(_BaseTool):  # type: ignore[misc,valid-type]
         "on-chain record. Call after finishing a task. Args: summary (str, what you "
         "did and the result), work_type (str, optional: research|analysis|generation|"
         "code_review|delivery|custom).")
+    args_schema: Type[BaseModel] = MintAttestToolSchema
 
     def __init__(self, api_key: Optional[str] = None, *, name: str = "crewai-agent",
                  default_work_type: str = "research", endpoint: Optional[str] = None,
