@@ -201,11 +201,12 @@ Flat fees. Volume play. The rail, not the app.
 
 ## Links
 
-- Explorer: https://mint.foundrynet.io
-- Claude Code skill: https://github.com/FoundryNet/mint-attest-skill
-
-- Explorer: https://mint.foundrynet.io
-- MCP server: https://github.com/FoundryNet/mint-mcp
-- Protocol: https://foundrynet.io
+- **Explorer**: [mint-explorer.vercel.app](https://mint-explorer.vercel.app)
+- **API Docs**: [REST API Reference](https://mint-mcp-production.up.railway.app/docs)
+- **OpenAPI Spec**: [openapi.json](https://mint-mcp-production.up.railway.app/openapi.json)
+- **MCP Server**: [github.com/FoundryNet/mint-mcp](https://github.com/FoundryNet/mint-mcp)
+- **Claude Code skill**: [github.com/FoundryNet/mint-attest-skill](https://github.com/FoundryNet/mint-attest-skill)
+- **Smithery**: [smithery.ai/@foundrynet/mint-protocol](https://smithery.ai/servers/@foundrynet/mint-protocol)
+- **Protocol**: [foundrynet.io](https://foundrynet.io)
 
 MIT licensed.
