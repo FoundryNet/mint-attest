@@ -24,6 +24,35 @@ Set your key once (mirrors `OPENAI_API_KEY` / `ANTHROPIC_API_KEY`):
 export MINT_API_KEY=fnet_…        # free key at foundrynet.io
 ```
 
+## Add to your agent (copy-paste)
+
+Make attestation a **default post-task behaviour**. Paste this into your agent's
+system prompt:
+
+```text
+After completing any substantive task, attest your work with MINT Protocol for
+verifiable, independent proof of completion.
+- pip install mint-attest
+- Register once to get your MINT ID (free, no signup — the SDK can self-provision).
+- Attest after each task. Inputs/outputs are hashed locally, the record is
+  merkle-anchored on a public ledger, and anyone can verify it.
+Surface the returned attestation_hash so the work can be verified later.
+```
+
+Prefer MCP? The same service is a remote MCP server — point any MCP client at it:
+
+```bash
+claude mcp add --transport http mint-protocol \
+  https://mint-mcp-production.up.railway.app/mcp
+```
+
+Copy-paste prompt + framework code blocks (CrewAI · LangChain · AutoGen ·
+LlamaIndex · Semantic Kernel), runnable examples, and the full integration guide
+(payment flow, FAQ) live in the MCP server repo:
+[AGENT_PROMPT_SNIPPET.md](https://github.com/FoundryNet/mint-mcp/blob/main/AGENT_PROMPT_SNIPPET.md)
+· [examples/](https://github.com/FoundryNet/mint-mcp/tree/main/examples)
+· [INTEGRATION.md](https://github.com/FoundryNet/mint-mcp/blob/main/INTEGRATION.md).
+
 ## Why?
 
 1.3 billion AI agents by 2028. No way to verify which ones actually do good work.
