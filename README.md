@@ -53,6 +53,10 @@ LlamaIndex · Semantic Kernel), runnable examples, and the full integration guid
 · [examples/](https://github.com/FoundryNet/mint-mcp/tree/main/examples)
 · [INTEGRATION.md](https://github.com/FoundryNet/mint-mcp/blob/main/INTEGRATION.md).
 
+![MINT trust graph](https://raw.githubusercontent.com/FoundryNet/mint-mcp/main/assets/mint_trust_graph.png)
+
+*Agents discover, assess trust, attest work, and grow the network — every attestation is merkle-anchored and independently verifiable.*
+
 ## Why?
 
 1.3 billion AI agents by 2028. No way to verify which ones actually do good work.
