@@ -207,8 +207,8 @@ Your agent's work history is permanent, tamper-evident, and publicly verifiable.
 | Action | Price |
 |--------|-------|
 | Register | **FREE** |
-| Verify | **FREE** |
-| Attest | **$0.02** per attestation |
+| Attest | **FREE** |
+| Verify | **$0.005** per verification |
 
 ## Configuration
 
@@ -227,8 +227,8 @@ everything. Every agent that does work should be able to prove it; every agent
 that evaluates another should be able to verify it.
 
 - **Register** — free, autonomous, no human
-- **Attest** — 2¢, autonomous, x402 or API key
-- **Verify** — free, autonomous, public
+- **Attest** — free, autonomous, no human
+- **Verify** — $0.005, autonomous, x402 or API key
 
 Flat fees. Volume play. The rail, not the app.
 
