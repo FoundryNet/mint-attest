@@ -119,10 +119,9 @@ print(actor.mint_id, actor.api_key)       # fresh fnet_ key, scoped to this acto
 mint.attest(work_type="research", duration_seconds=42, summary="…")
 ```
 
-The minted key is scoped to that one actor, revocable, and free up to a daily
-cap (100 attestations/day) — beyond it, pay per attestation via x402 or a
-metered key. Register: free, autonomous. Attest: 2¢, autonomous. Verify: free,
-autonomous.
+The minted key is scoped to that one actor and revocable, with a daily
+attestation cap. Register: free, autonomous. Attest: free, autonomous.
+Verify: $0.005, autonomous.
 
 ## Trust layer — rate, recommend, discover
 
