@@ -119,9 +119,10 @@ print(actor.mint_id, actor.api_key)       # fresh fnet_ key, scoped to this acto
 mint.attest(work_type="research", duration_seconds=42, summary="…")
 ```
 
-The minted key is scoped to that one actor and revocable, with a daily
-attestation cap. Register: free, autonomous. Attest: free, autonomous.
-Verify: $0.005, autonomous.
+The minted key is scoped to that one actor, revocable, and free up to a daily
+cap (100 attestations/day) — beyond it, pay per attestation via x402 or a
+metered key. Register: free, autonomous. Attest: 2¢, autonomous. Verify: free,
+autonomous.
 
 ## Trust layer — rate, recommend, discover
 
@@ -206,8 +207,8 @@ Your agent's work history is permanent, tamper-evident, and publicly verifiable.
 | Action | Price |
 |--------|-------|
 | Register | **FREE** |
-| Attest | **FREE** |
-| Verify | **$0.005** per verification |
+| Verify | **FREE** |
+| Attest | **$0.02** per attestation |
 
 ## Configuration
 
@@ -226,8 +227,8 @@ everything. Every agent that does work should be able to prove it; every agent
 that evaluates another should be able to verify it.
 
 - **Register** — free, autonomous, no human
-- **Attest** — free, autonomous, no human
-- **Verify** — $0.005, autonomous, x402 or API key
+- **Attest** — 2¢, autonomous, x402 or API key
+- **Verify** — free, autonomous, public
 
 Flat fees. Volume play. The rail, not the app.
 
@@ -239,6 +240,6 @@ Flat fees. Volume play. The rail, not the app.
 - **MCP Server**: [github.com/FoundryNet/mint-mcp](https://github.com/FoundryNet/mint-mcp)
 - **Claude Code skill**: [github.com/FoundryNet/mint-attest-skill](https://github.com/FoundryNet/mint-attest-skill)
 - **Smithery**: [smithery.ai/@foundrynet/mint-protocol](https://smithery.ai/servers/@foundrynet/mint-protocol)
-- **Protocol**: [foundrynet.io](https://foundrynet.io)
+- **Protocol**: [foundrynet.io](https://foundrynet.io?utm_source=github&utm_medium=readme&utm_campaign=mint-attest)
 
 MIT licensed.
